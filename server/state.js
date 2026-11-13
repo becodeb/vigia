@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 export function emptyState() {
-  return { pi: null, items: {}, home: {}, probes: {}, events: [], push: [], notify: {} };
+  return { pi: null, items: {}, home: {}, probes: {}, events: [], push: [], notify: {}, ignored: [] };
 }
 
 export function loadState(dir) {
@@ -51,6 +51,7 @@ export function mergePiHeartbeat(state, body, now) {
     if (!raw || typeof raw.id !== 'string' || !KINDS.has(raw.kind)) continue;
     const id = raw.id.slice(0, 200);
     seen.add(id);
+    if ((state.ignored || []).includes(id)) continue;
     let it = state.items[id];
     // A container first seen stopped is a deliberately parked one (dev DBs, old builds):
     // only start tracking it once it has been seen running.

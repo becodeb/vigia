@@ -53,12 +53,11 @@ function renderItem(it) {
   const row = h('div', { class: `item${it.missing ? ' missing' : ''}` },
     h('div', { class: 'name' }, it.name, h('div', { class: 'detail' }, it.missing ? 'disappeared' : it.detail || '')),
     dots);
-  if (it.missing) {
-    row.append(h('button', { class: 'x', title: 'Forget', onclick: async () => {
-      await api(`/api/items/${encodeURIComponent(it.id)}`, { method: 'DELETE' });
-      refresh();
-    } }, 'delete'));
-  }
+  row.append(h('button', { class: 'x', title: it.missing ? 'Forget' : 'Stop monitoring this item', onclick: async () => {
+    if (!it.missing && !confirm(`Stop monitoring ${it.name}?`)) return;
+    await api(`/api/items/${encodeURIComponent(it.id)}`, { method: 'DELETE' });
+    refresh();
+  } }, it.missing ? 'delete' : 'ignore'));
   return row;
 }
 
@@ -87,7 +86,12 @@ function render(s) {
   $('groups').replaceChildren(...groups.flatMap(([kind, label]) => {
     const list = s.items.filter((i) => i.kind === kind).sort((a, b) => a.missing - b.missing || a.name.localeCompare(b.name));
     return list.length ? [h('h2', {}, label), h('div', { class: 'list' }, list.map(renderItem))] : [];
-  }));
+  }), ...(s.ignored.length ? [h('h2', {}, 'Ignored'), h('div', { class: 'list' }, s.ignored.map((id) =>
+    h('div', { class: 'item missing' }, h('div', { class: 'name' }, id),
+      h('button', { class: 'x', title: 'Monitor again', onclick: async () => {
+        await api(`/api/ignored/${encodeURIComponent(id)}`, { method: 'DELETE' });
+        refresh();
+      } }, 'restore'))))] : []));
 
   $('home').replaceChildren(s.home.length
     ? h('table', {},

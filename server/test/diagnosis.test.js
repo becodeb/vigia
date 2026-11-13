@@ -159,3 +159,9 @@ test('container first seen stopped is not tracked until seen running', () => {
   mergePiHeartbeat(st, { items: [{ id: 'container:db', kind: 'container', name: 'db', ok: false }] }, 3);
   assert.equal(st.items['container:db'].ok, false);
 });
+
+test('ignored items are not rediscovered', () => {
+  const st = { items: {}, events: [], ignored: ['web:x.example'] };
+  mergePiHeartbeat(st, { items: [{ id: 'web:x.example', kind: 'web', name: 'x.example', ok: true }] }, 1);
+  assert.equal(st.items['web:x.example'], undefined);
+});

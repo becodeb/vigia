@@ -137,6 +137,7 @@ function publicState() {
       ...diag.items[i.id],
     })),
     home: Object.values(state.home).map((h) => ({ ...h, ageMs: now - h.lastSeen })),
+    ignored: state.ignored || [],
     events: state.events.slice(-100).reverse(),
     pushCount: state.push.length,
     pushEnabled: push.enabled,
@@ -190,8 +191,17 @@ async function handleApi(req, res, url) {
   let mm;
   if (m === 'DELETE' && (mm = /^\/api\/items\/(.+)$/.exec(p))) {
     const id = decodeURIComponent(mm[1]);
-    if (!state.items[id]) return send(res, 404, { error: 'not found' });
+    const it = state.items[id];
+    if (!it) return send(res, 404, { error: 'not found' });
+    // A present item would be rediscovered on the next heartbeat: remember to ignore it.
+    if (!it.missing && !state.ignored.includes(id)) state.ignored.push(id);
     delete state.items[id];
+    save();
+    return send(res, 200, { ok: true });
+  }
+  if (m === 'DELETE' && (mm = /^\/api\/ignored\/(.+)$/.exec(p))) {
+    const id = decodeURIComponent(mm[1]);
+    state.ignored = state.ignored.filter((x) => x !== id);
     save();
     return send(res, 200, { ok: true });
   }
