@@ -13,8 +13,9 @@ Copy-Item -Force (Join-Path $PSScriptRoot 'vigia-home.ps1') (Join-Path $dir 'vig
 @{ url = $Url; token = $Token; piLanIp = $PiLanIp } | ConvertTo-Json | Set-Content -Encoding UTF8 -Path (Join-Path $dir 'config.json')
 
 $script = Join-Path $dir 'vigia-home.ps1'
-$action = New-ScheduledTaskAction -Execute 'powershell.exe' `
-    -Argument "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$script`""
+# conhost --headless keeps the console from flashing every 5 minutes (-WindowStyle Hidden alone still flashes).
+$action = New-ScheduledTaskAction -Execute 'conhost.exe' `
+    -Argument "--headless powershell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$script`""
 $every5 = New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpan -Minutes 5) -RepetitionDuration (New-TimeSpan -Days 3650)
 $logon = New-ScheduledTaskTrigger -AtLogOn -User "$env:USERDOMAIN\$env:USERNAME"
 $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable `
