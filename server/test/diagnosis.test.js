@@ -149,3 +149,13 @@ test('notify: disappeared item pushes once after 3 missed heartbeats', () => {
   assert.equal(evalN(st).filter((l) => /disappeared/.test(l.text)).length, 1);
   assert.equal(evalN(st).filter((l) => /disappeared/.test(l.text)).length, 0);
 });
+
+import { mergePiHeartbeat } from '../state.js';
+test('container first seen stopped is not tracked until seen running', () => {
+  const st = { items: {}, events: [] };
+  mergePiHeartbeat(st, { items: [{ id: 'container:db', kind: 'container', name: 'db', ok: false }] }, 1);
+  assert.equal(st.items['container:db'], undefined);
+  mergePiHeartbeat(st, { items: [{ id: 'container:db', kind: 'container', name: 'db', ok: true }] }, 2);
+  mergePiHeartbeat(st, { items: [{ id: 'container:db', kind: 'container', name: 'db', ok: false }] }, 3);
+  assert.equal(st.items['container:db'].ok, false);
+});

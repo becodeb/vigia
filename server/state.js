@@ -52,6 +52,9 @@ export function mergePiHeartbeat(state, body, now) {
     const id = raw.id.slice(0, 200);
     seen.add(id);
     let it = state.items[id];
+    // A container first seen stopped is a deliberately parked one (dev DBs, old builds):
+    // only start tracking it once it has been seen running.
+    if (!it && raw.kind === 'container' && !raw.ok) continue;
     if (!it) {
       it = state.items[id] = { id, kind: raw.kind, firstSeen: now };
       added.push(it);
