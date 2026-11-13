@@ -1,0 +1,23 @@
+services:
+  app:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    expose:
+      - "3000"
+    environment:
+      DASH_PASSWORD: ${DASH_PASSWORD}
+      PI_TOKEN: ${PI_TOKEN}
+      HOME_TOKEN: ${HOME_TOKEN}
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY}
+      VAPID_SUBJECT: ${VAPID_SUBJECT}
+      PI_HOST: ${PI_HOST}
+      PI_SSH_PORT: ${PI_SSH_PORT}
+      SESSION_SECRET: ${SESSION_SECRET}
+    volumes:
+      - vigia-data:/data
+
+volumes:
+  vigia-data:

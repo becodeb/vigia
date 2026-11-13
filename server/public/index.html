@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0f172a">
+  <title>vigia</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <main id="app">
+    <section id="login" hidden>
+      <h1>vigia</h1>
+      <form id="login-form">
+        <input id="password" type="password" placeholder="Password" autocomplete="current-password" required>
+        <button type="submit">Log in</button>
+        <p id="login-error" class="muted"></p>
+      </form>
+    </section>
+    <section id="dash" hidden>
+      <div id="banner" class="banner"><h1 id="banner-title"></h1><p id="banner-detail"></p></div>
+      <h2>Pi</h2>
+      <dl id="vitals" class="vitals"></dl>
+      <div id="groups"></div>
+      <h2>Home computers</h2>
+      <div id="home"></div>
+      <h2>Notifications</h2>
+      <div class="row">
+        <button id="enable-push">Enable notifications</button>
+        <button id="test-push" class="secondary">Send test</button>
+        <span id="push-status" class="muted"></span>
+      </div>
+      <h2>Events</h2>
+      <ul id="events" class="events"></ul>
+      <p class="muted" id="updated"></p>
+    </section>
+  </main>
+  <script src="/app.js" type="module"></script>
+</body>
+</html>
